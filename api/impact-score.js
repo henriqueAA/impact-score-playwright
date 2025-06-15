@@ -10,25 +10,30 @@ app.get('/api/impact-score', async (req, res) => {
     if (!issn) return res.status(400).json({ error: "ISSN não fornecido" });
 
     const url = `https://www.resurchify.com/find/?query=${issn}`;
-
     const browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
 
+    await page.goto(url, { waitUntil: 'networkidle' });
+
+    // Aguarda seletor com as badges laranjas
+    await page.waitForSelector("span.badge-orange", { timeout: 5000 });
+
+    // Extrai o texto do Impact Score
     const score = await page.evaluate(() => {
-      const spans = Array.from(document.querySelectorAll("span.badge-orange"));
-      const span = spans.find(el => el.textContent.includes("Impact Score:"));
-      return span ? span.textContent.replace("Impact Score:", "").trim() : null;
+      const badges = Array.from(document.querySelectorAll("span.badge-orange"));
+      const impactBadge = badges.find(b => b.textContent.includes("Impact Score:"));
+      return impactBadge ? impactBadge.textContent.split(":")[1].trim() : null;
     });
 
     await browser.close();
+
     res.json({ issn, score });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erro interno", details: err.message });
+  } catch (error) {
+    console.error("Erro interno:", error);
+    res.status(500).json({ error: "Erro interno", details: error.message });
   }
 });
 
 app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+  console.log(`API rodando em http://localhost:${port}`);
 });
