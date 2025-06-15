@@ -1,7 +1,10 @@
 import express from 'express';
+import cors from 'cors';
 import { chromium } from 'playwright';
 
 const app = express();
+app.use(cors()); // ⬅️ Habilita CORS para todas as origens
+
 const port = process.env.PORT || 3000;
 
 app.get('/api/impact-score', async (req, res) => {
@@ -18,10 +21,8 @@ app.get('/api/impact-score', async (req, res) => {
 
     let score = null;
     try {
-      // Espera o <b> que contém o ícone do Impact Score
       await page.waitForSelector('b:has(img[src*="if.svg"])', { timeout: 15000 });
 
-      // Extrai o texto de dentro da tag <b>
       score = await page.evaluate(() => {
         const bTags = Array.from(document.querySelectorAll('b'));
         const impact = bTags.find(b =>
