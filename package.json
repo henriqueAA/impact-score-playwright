@@ -1,4 +1,12 @@
-"dependencies": {
-  "playwright": "^1.43.1",
-  "express": "^4.18.2"
+{
+  "name": "impact-score-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node api/impact-score.js"
+  },
+  "dependencies": {
+    "playwright": "^1.43.1",
+    "express": "^4.18.2"
+  }
 }
