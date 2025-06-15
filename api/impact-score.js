@@ -34,7 +34,7 @@ app.get('/api/impact-score', async (req, res) => {
     let score = null;
     try {
       // Espera o <b> que contém o ícone do Impact Score
-      await page.waitForSelector('b:has(img[src*="if.svg"])', { timeout: 15000 });
+      await page.waitForSelector('b:has(img[src*="if.svg"])', { timeout: 1500 });
 
       // Extrai o texto de dentro da tag <b>
       score = await page.evaluate(() => {
