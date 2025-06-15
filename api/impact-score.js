@@ -13,7 +13,7 @@ app.get('/api/impact-score', async (req, res) => {
     browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
 
-    const url = `https://www.resurchify.com/find/?query=${issn}`;
+    const url = `https://www.resurchify.com/find/?query=${issn}#search_results`;
     await page.goto(url, { waitUntil: 'networkidle' });
 
     let score = null;
