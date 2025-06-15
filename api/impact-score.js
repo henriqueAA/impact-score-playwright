@@ -1,6 +1,10 @@
+import express from 'express';
 import { chromium } from 'playwright';
 
-export default async function handler(req, res) {
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get('/api/impact-score', async (req, res) => {
   try {
     const issn = req.query.issn;
     if (!issn) return res.status(400).json({ error: "ISSN não fornecido" });
@@ -18,11 +22,13 @@ export default async function handler(req, res) {
     });
 
     await browser.close();
-
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.status(200).json({ issn, score });
-  } catch (error) {
-    console.error("Erro interno:", error);
-    res.status(500).json({ error: "Erro interno", details: error.message });
+    res.json({ issn, score });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro interno", details: err.message });
   }
-}
+});
+
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
+});
