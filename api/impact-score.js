@@ -13,16 +13,24 @@ app.get('/api/impact-score', async (req, res) => {
     browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
 
-    const url = `https://www.resurchify.com/find/?query=${issn}#search_results`;
+    const url = `https://www.resurchify.com/find/?query=${issn}`;
     await page.goto(url, { waitUntil: 'networkidle' });
 
     let score = null;
     try {
-      await page.waitForSelector("span.badge-orange", { timeout: 35000 });
+      // Espera o <b> que contém o ícone do Impact Score
+      await page.waitForSelector('b:has(img[src*="if.svg"])', { timeout: 15000 });
+
+      // Extrai o texto de dentro da tag <b>
       score = await page.evaluate(() => {
-        const badges = Array.from(document.querySelectorAll("span.badge-orange"));
-        const impactBadge = badges.find(b => b.textContent.includes("Impact Score:"));
-        return impactBadge ? impactBadge.textContent.split(":")[1].trim() : null;
+        const bTags = Array.from(document.querySelectorAll('b'));
+        const impact = bTags.find(b =>
+          b.textContent.includes('Impact Score:') &&
+          b.querySelector('img[src*="if.svg"]')
+        );
+        const text = impact?.textContent || '';
+        const match = text.match(/Impact Score:\s*([\d.]+)/i);
+        return match ? match[1] : null;
       });
     } catch (waitErr) {
       console.warn("Impact Score não encontrado dentro do tempo limite.");
