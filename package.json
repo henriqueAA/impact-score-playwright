@@ -1,0 +1,11 @@
+{
+  "name": "impact-score-api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node api/impact-score.js"
+  },
+  "dependencies": {
+    "playwright": "^1.43.1"
+  }
+}
